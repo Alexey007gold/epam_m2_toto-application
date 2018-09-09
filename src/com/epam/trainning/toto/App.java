@@ -40,12 +40,7 @@ public class App {
         roundsForDate.forEach(r -> {
             int hits = countHits(r.getOutcomes(), outcomesInput);
             Hit hit = r.getPrizesMap().get(hits);
-            String prize;
-            if (hit != null) {
-                prize = hit.getPrize();
-            } else {
-                prize = "0";
-            }
+            String prize = (hit == null) ? "0" : hit.getPrize();
             System.out.println(String.format("Result: hits: %d, amount: %s", hits, prize));
         });
     }

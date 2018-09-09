@@ -50,9 +50,8 @@ public class TotoService {
     }
 
     public void printResultsDistribution(List<Round> rounds) {
-        Map<Outcome, Integer> distributionMap;
-        for (Round round : rounds) {
-            distributionMap = new EnumMap<>(Outcome.class);
+        rounds.forEach(round -> {
+            Map<Outcome, Integer> distributionMap = new EnumMap<>(Outcome.class);
             for (Outcome outcome : round.getOutcomes()) {
                 distributionMap.merge(outcome, 1, (a, b) -> a + b);
             }
@@ -65,7 +64,7 @@ public class TotoService {
             format.setMinimumFractionDigits(2);
             System.out.println(String.format("Team #1 won: %s %%, team #2 won %s %%, draw %s %%",
                     format.format(team1), format.format(team2), format.format(draw)));
-        }
+        });
     }
 
     private double getPercentage(Integer outcome, int games) {
