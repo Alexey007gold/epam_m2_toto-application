@@ -75,7 +75,7 @@ public class App {
             if (p.matcher(input).matches()) {
                 return input;
             } else {
-                System.out.print("Try again: ");
+                System.out.print("14 characters are needed, ('1', '2' 'X' only) Try again: ");
                 input = reader.readLine();
             }
         }
@@ -90,7 +90,7 @@ public class App {
             try {
                 return LocalDate.parse(input, formatter);
             } catch (RuntimeException e) {
-                System.out.print("Try again: ");
+                System.out.print("Date format '1970.01.21.'; Try again: ");
                 input = reader.readLine();
             }
         }
