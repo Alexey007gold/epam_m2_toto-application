@@ -15,7 +15,7 @@ import java.util.*;
  */
 public class TotoService {
 
-    public List<Round> parseInputFile(String filePath) throws IOException {
+    public SortedSet<Round> parseInputFile(String filePath) throws IOException {
         String[] lines = new String(Files.readAllBytes(Paths.get(filePath))).split("\n");
         List<Round> games = new ArrayList<>();
         for (String line : lines) {
@@ -33,9 +33,9 @@ public class TotoService {
             }
             List<Outcome> outcomes = new ArrayList<>();
             for (int i = 14; i < 27; i++) {
-                outcomes.add(getOutcomeVal(values[i]));
+                outcomes.add(getOutcomeVal(values[i].trim()));
             }
-            outcomes.add(getOutcomeVal(values[27].replace("+", "")));
+            outcomes.add(getOutcomeVal(values[27].trim().replace("+", "")));
 
             Round game = new Round();
             game.setYear(year);
@@ -49,7 +49,7 @@ public class TotoService {
         return games;
     }
 
-    public void printResultsDistribution(List<Round> rounds) {
+    public void printResultsDistribution(SortedSet<Round> rounds) {
         rounds.forEach(round -> {
             Map<Outcome, Integer> distributionMap = new EnumMap<>(Outcome.class);
             for (Outcome outcome : round.getOutcomes()) {
@@ -79,16 +79,9 @@ public class TotoService {
     }
 
     private Outcome getOutcomeVal(String value) {
-        switch (value) {
-            case "1":
-                return Outcome.ONE;
-            case "2":
-                return Outcome.TWO;
-            case "X":
-            case "x":
-                return Outcome.X;
-            default:
-                throw new IllegalArgumentException("Incorrect outcome value: " + value);
-        }
+        return Arrays.stream(Outcome.values())
+                .filter(v -> v.getValue().equalsIgnoreCase(value))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Incorrect outcome value: " + value));
     }
 }

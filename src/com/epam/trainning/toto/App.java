@@ -10,18 +10,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class App {
 
-    private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    private static Scanner reader = new Scanner(System.in);
 
     public static void main(String[] args) throws IOException {
         TotoService service = new TotoService();
-        List<Round> rounds = service.parseInputFile("toto.csv");
+        SortedSet<Round> rounds = service.parseInputFile("toto.csv");
 
         System.out.println(String.format("The largest prize ever recorded is: %s%n",
                 service.getMaxPrizeValue(rounds).getPrize()));
@@ -31,7 +30,7 @@ public class App {
         interactWithUser(rounds);
     }
 
-    private static void interactWithUser(List<Round> rounds) throws IOException {
+    private static void interactWithUser(SortedSet<Round> rounds) throws IOException {
         LocalDate date = getDateFromUser();
         List<Round> roundsForDate = findRoundsForDate(rounds, date);
 
@@ -41,7 +40,7 @@ public class App {
             int hits = countHits(r.getOutcomes(), outcomesInput);
             Hit hit = r.getPrizesMap().get(hits);
             String prize = (hit == null) ? "0" : hit.getPrize();
-            System.out.println(String.format("Result: hits: %d, amount: %s", hits, prize));
+            System.out.println(String.format("Result: hits: %d, amount: %s%n", hits, prize));
         });
     }
 
@@ -62,8 +61,8 @@ public class App {
     }
 
     private static String getOutcomesFromUser() throws IOException {
-        System.out.print("Enter outcomes (1/2/X): ");
-        String input = reader.readLine();
+        System.out.print("Enter outcomes (1/2/X) or 'q' to quit: ");
+        String input = getInput();
 
         Pattern p = Pattern.compile("[12xX]{14}");
         while (true) {
@@ -71,23 +70,36 @@ public class App {
                 return input;
             } else {
                 System.out.print("14 characters are needed, ('1', '2' 'X' only) Try again: ");
-                input = reader.readLine();
+                input = getInput();
             }
         }
     }
 
     private static LocalDate getDateFromUser() throws IOException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd.");
-        System.out.print("Enter date: ");
-        String input = reader.readLine();
+        System.out.print("Enter date or 'q' to quit: ");
+        String input = getInput();
 
         while (true) {
             try {
                 return LocalDate.parse(input, formatter);
             } catch (RuntimeException e) {
                 System.out.print("Date format '1970.01.21.'; Try again: ");
-                input = reader.readLine();
+                input = getInput();
             }
         }
+    }
+
+    private static String getInput() {
+        String input = reader.nextLine();
+        if (input.equalsIgnoreCase("q")) {
+            finish();
+        }
+        return input;
+    }
+
+    private static void finish() {
+        System.out.println("Bye!");
+        System.exit(0);
     }
 }

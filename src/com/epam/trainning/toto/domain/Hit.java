@@ -1,5 +1,6 @@
 package com.epam.trainning.toto.domain;
 
+import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,33 +10,36 @@ import java.util.regex.Pattern;
 public class Hit implements Comparable<Hit> {
 
     private int number;
-    private String prize;
+    private double prizeValue;
+    private String prizeCurrency;
 
     public Hit(int number, String prize) {
         this.number = number;
-        this.prize = prize;
+
+        Pattern p = Pattern.compile("[^0-9.]");
+        Matcher m = p.matcher(prize);
+        if (m.find()) {
+            this.prizeValue = Double.parseDouble(prize.substring(0, m.start()).replaceAll(" ", "").trim());
+            this.prizeCurrency = prize.substring(m.start()).trim();
+        } else {
+            this.prizeValue = Double.parseDouble(prize.replaceAll(" ", "").trim());
+        }
     }
 
     public int getNumber() {
         return number;
     }
 
+    public String getPrizeCurrency() {
+        return prizeCurrency;
+    }
+
+    public double getPrizeValue() {
+        return prizeValue;
+    }
+
     public String getPrize() {
-        return prize;
-    }
-
-    @Override
-    public int compareTo(Hit o) {
-        return this.getPrizeValue() - o.getPrizeValue();
-    }
-
-    public int getPrizeValue() {
-        Pattern p = Pattern.compile("[^0-9 ]");
-        Matcher m = p.matcher(prize);
-        if (m.find()) {
-            String valueStr = prize.substring(0, m.start()).replaceAll(" ", "");
-            return Integer.parseInt(valueStr);
-        }
-        return Integer.parseInt(prize.replaceAll(" ", ""));
+        DecimalFormat format = new DecimalFormat("###,###.##");
+        return format.format(prizeValue) + " " + prizeCurrency;
     }
 }
