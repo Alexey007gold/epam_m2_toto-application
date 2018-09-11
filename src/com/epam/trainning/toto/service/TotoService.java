@@ -17,12 +17,12 @@ public class TotoService {
 
     public SortedSet<Round> parseInputFile(String filePath) throws IOException {
         String[] lines = new String(Files.readAllBytes(Paths.get(filePath))).split("\n");
-        List<Round> games = new ArrayList<>();
-        for (String line : lines) {
+        SortedSet<Round> games = new TreeSet<>(Comparator.comparing(Round::getDate));
+        Arrays.stream(lines).forEach(line -> {
             String[] values = line.split(";");
             int year = Integer.parseInt(values[0]);
             int week = Integer.parseInt(values[1]);
-            int round = !values[2].equals("-") ? Integer.parseInt(values[2]) : -1;
+            int round = values[2].matches("\\d+") ? Integer.parseInt(values[2]) : -1;
             String date = values[3];
 
             Map<Integer, Hit> prizesMap = new HashMap<>();
@@ -45,16 +45,14 @@ public class TotoService {
             game.setPrizesMap(prizesMap);
             game.setOutcomes(outcomes);
             games.add(game);
-        }
+        });
         return games;
     }
 
     public void printResultsDistribution(SortedSet<Round> rounds) {
         rounds.forEach(round -> {
             Map<Outcome, Integer> distributionMap = new EnumMap<>(Outcome.class);
-            for (Outcome outcome : round.getOutcomes()) {
-                distributionMap.merge(outcome, 1, (a, b) -> a + b);
-            }
+            round.getOutcomes().forEach(o -> distributionMap.merge(o, 1, (a, b) -> a + b));
 
             int games = round.getOutcomes().size();
             double team1 = getPercentage(distributionMap.get(Outcome.ONE), games);
@@ -71,7 +69,7 @@ public class TotoService {
         return outcome == null ? 0 : outcome * 100.0 / games;
     }
 
-    public Hit getMaxPrizeValue(List<Round> rounds) {
+    public Hit getMaxPrizeValue(SortedSet<Round> rounds) {
         return rounds.stream()
                 .flatMap(round -> round.getPrizesMap().values().stream())
                 .max(Comparator.comparing(Hit::getPrizeValue))
