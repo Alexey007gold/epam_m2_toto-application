@@ -5,12 +5,13 @@ import com.epam.trainning.toto.domain.Outcome;
 import com.epam.trainning.toto.domain.Round;
 import com.epam.trainning.toto.service.TotoService;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.SortedSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,9 @@ public class App {
         service.printResultsDistribution(rounds);
         System.out.println();
 
-        interactWithUser(rounds);
+        while (true) {
+            interactWithUser(rounds);
+        }
     }
 
     private static void interactWithUser(SortedSet<Round> rounds) throws IOException {
@@ -47,14 +50,14 @@ public class App {
     private static int countHits(List<Outcome> outcomes, String guess) {
         int hits = 0;
         for (int i = 0; i < guess.length(); i++) {
-            if (outcomes.get(i).getValue().equals(String.valueOf(guess.charAt(i)))) {
+            if (outcomes.get(i).getValue().equalsIgnoreCase(String.valueOf(guess.charAt(i)))) {
                 hits++;
             }
         }
         return hits;
     }
 
-    private static List<Round> findRoundsForDate(List<Round> rounds, LocalDate date) {
+    private static List<Round> findRoundsForDate(SortedSet<Round> rounds, LocalDate date) {
         return rounds.stream()
                 .filter(r -> Objects.equals(r.getDate(), date))
                 .collect(Collectors.toList());

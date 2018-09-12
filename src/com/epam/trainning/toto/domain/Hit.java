@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 /**
  * Created by Oleksii_Kovetskyi on 9/8/2018.
  */
-public class Hit implements Comparable<Hit> {
+public class Hit {
 
     private static final Pattern prizePattern = Pattern.compile("[^0-9. ]");
 
