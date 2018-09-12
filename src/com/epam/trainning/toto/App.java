@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class App {
 
-    private static Scanner reader = new Scanner(System.in);
+    private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) throws IOException {
         TotoService service = new TotoService();
@@ -63,42 +63,33 @@ public class App {
                 .collect(Collectors.toList());
     }
 
-    private static String getOutcomesFromUser() throws IOException {
-        System.out.print("Enter outcomes (1/2/X) or 'q' to quit: ");
-        String input = getInput();
-
-        Pattern p = Pattern.compile("[12xX]{14}");
-        while (true) {
-            if (p.matcher(input).matches()) {
-                return input;
-            } else {
-                System.out.print("14 characters are needed, ('1', '2' 'X' only) Try again: ");
-                input = getInput();
-            }
-        }
+    private static String getOutcomesFromUser() {
+        Pattern pattern = Pattern.compile("([12xX]{14})|([qQ])");
+        return getInput(pattern, "Enter outcomes (1/2/X) or 'q' to quit: ",
+                "14 characters are needed, ('1', '2' 'X' only)");
     }
 
-    private static LocalDate getDateFromUser() throws IOException {
+    private static LocalDate getDateFromUser() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd.");
-        System.out.print("Enter date or 'q' to quit: ");
-        String input = getInput();
 
+        Pattern pattern = Pattern.compile("(\\d{4}\\.\\d{2}\\.\\d{2}\\.)|([qQ])");
+        return LocalDate.parse(getInput(pattern, "Enter date or 'q' to quit: ", "1970.01.21."), formatter);
+    }
+
+    private static String getInput(Pattern pattern, String promptMessage, String formatMessage) {
+        System.out.print(promptMessage);
         while (true) {
             try {
-                return LocalDate.parse(input, formatter);
-            } catch (RuntimeException e) {
-                System.out.print("Date format '1970.01.21.'; Try again: ");
-                input = getInput();
+                String input = scanner.next(pattern);
+                if (input.equalsIgnoreCase("q")) {
+                    finish();
+                }
+                return input;
+            } catch (Exception ignored) {
+                System.out.print(String.format("Input format '%s'; Try again: ", formatMessage));
+                scanner.nextLine();
             }
         }
-    }
-
-    private static String getInput() {
-        String input = reader.nextLine();
-        if (input.equalsIgnoreCase("q")) {
-            finish();
-        }
-        return input;
     }
 
     private static void finish() {
