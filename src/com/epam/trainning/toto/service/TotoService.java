@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Oleksii_Kovetskyi on 9/8/2018.
@@ -16,6 +18,7 @@ import java.util.*;
 public class TotoService {
 
     public SortedSet<Round> parseInputFile(String filePath) throws IOException {
+        Pattern pattern = Pattern.compile("[12xX]");
         String[] lines = new String(Files.readAllBytes(Paths.get(filePath))).split("\n");
         SortedSet<Round> games = new TreeSet<>(Comparator.comparing(Round::getDate));
         Arrays.stream(lines).forEach(line -> {
@@ -32,10 +35,11 @@ public class TotoService {
                 hits--;
             }
             List<Outcome> outcomes = new ArrayList<>();
-            for (int i = 14; i < 27; i++) {
-                outcomes.add(getOutcomeVal(values[i].trim()));
+            for (int i = 14; i < 28; i++) {
+                Matcher m = pattern.matcher(values[i]);
+                if (!m.find()) return;
+                outcomes.add(getOutcomeVal(m.group()));
             }
-            outcomes.add(getOutcomeVal(values[27].trim().replace("+", "")));
 
             Round game = new Round();
             game.setYear(year);
